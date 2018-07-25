@@ -12,22 +12,25 @@ import { getPlayerInfo } from '../fetching/GetPlayerInfo';
 import AllPlayersComponent from './AllPlayersComponent';
 
 export default class SearchComponent extends React.Component {
+  
   constructor(props) {
       super(props);
       this.state = {
-        player: '',
+        year: '',
         error: false
       }
       this.handleChange = this.handleChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
     }
+
     handleChange(e) {
       this.setState({
-        player: e.nativeEvent.text
+        year: e.nativeEvent.text
       });
     }
+
     handleSubmit() {
-      getPlayerInfo(this.state.player).then((res) => {
+      getPlayerInfo(this.state.year).then((res) => {
         if(res == null) {
             this.setState({
                 error: 'Year Not Found or Wrong Input'
@@ -45,25 +48,28 @@ export default class SearchComponent extends React.Component {
         }
       });
     }
+
   render() {
+
     let showErr = (
-      this.state.error ?
-      <Text>
-        {this.state.error}
-      </Text> :
-      <View></View>
+      this.state.error ? <Text> {this.state.error} </Text> : <View></View>
     );
+
     return (
       <View style={styles.main}>
         <Image
           style={styles.image}
           source={{uri: 'https://vignette.wikia.nocookie.net/meme/images/7/7d/YaoMingFace.jpg/revision/latest?cb=20141108223024'}}
         />
-        <Text style={styles.title}>Show All NBA Players of Year</Text>
+        <Text style={styles.title}>
+          Show All NBA Players of Year
+        </Text>
         <TextInput
           style={styles.searchInput}
           onChange={this.handleChange}
           placeholder="Only from 2012 to 2018"
+          //keyboardType='numeric'
+          maxLength={4}
         />
         <TouchableHighlight
           style = {styles.button}

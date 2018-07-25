@@ -3,17 +3,14 @@ import {
   Text,
   View,
   StyleSheet,
-  Image,
   FlatList,
   Alert
 } from 'react-native';
-import { getCertainPlayerInfo, getCertainPlayerImage } from '../fetching/GetPlayerInfo';
+import { getCertainPlayerInfo, getCertainPlayerImage, getCertainTeamImage} from '../fetching/GetPlayerInfo';
 import PlayerComponent from './PlayerComponent';
 
 // export default class AllPlayersComponent extends React.Component {
-
 //   render() {
-  
 //     return(
 //     <View style={{flex: 1, paddingTop:5}}>
 //       <FlatList
@@ -26,7 +23,6 @@ import PlayerComponent from './PlayerComponent';
 //       />
 //     </View>
 //     );
-
 //   }
 // }
 
@@ -35,12 +31,10 @@ import PlayerComponent from './PlayerComponent';
 export default class AllPlayersComponent extends React.Component {
 
   constructor(props){
-
     super(props);
     this.state = {
       isLoading: true,
     }
-    
   }
 
   FlatListItemSeparator = () => {
@@ -57,55 +51,62 @@ export default class AllPlayersComponent extends React.Component {
   }
 
   GetFlatListItem(item){
-
     getCertainPlayerInfo(item.personId).then((res) => {
       if(res == null) {
         Alert.alert("No Profile Exists");
       }
       else {
 
-        //Alert.alert(res.league.standard.stats.careerSummary);
+        //Alert.alert(getCertainTeamImage(val));
 
         this.props.navigator.push({
+
           title: 'Career Summary',
+          
           passProps: {info : res.league.standard.stats.careerSummary, 
                       image : getCertainPlayerImage(item.lastName, item.firstName),
                       first : item.firstName,
-                      last : item.lastName
+                      last : item.lastName,
+                      jersey : item.jersey,
+                      team : getCertainTeamImage(item.teamId),
                     },
+
           component: PlayerComponent
+        
         });
       }
     });
-
   }
 
   render() {
-  
     return(
-      <View style={{flex: 1, backgroundColor : 'gold',}}>
+      <View style={styles.photo}>
         <FlatList
           data={this.props.standard}
-
           ItemSeparatorComponent = {this.FlatListItemSeparator}
           
           renderItem={({item}) => 
           <Text style = {styles.each} onPress = {this.GetFlatListItem.bind(this, item)}>
             {item.lastName}, {item.firstName}
           </Text>}
+
           keyExtractor={(item, index) => index.toString()}
         />
       </View>
     );
-
   }
 }
 
-const styles = StyleSheet.create(
-  {
-    each: {
-      marginLeft : 5,
-      fontSize : 15, 
-      fontStyle : 'italic'
-    }
+const styles = StyleSheet.create({
+
+  each: {
+    marginLeft : 5,
+    fontSize : 15, 
+    fontStyle : 'italic'
+  },
+  photo: {
+    flex: 1, 
+    backgroundColor : 'gold'
+  },
+
 });

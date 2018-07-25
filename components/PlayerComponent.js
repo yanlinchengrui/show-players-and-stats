@@ -13,8 +13,6 @@ const window = Dimensions.get('window');
 
 export default class PlayerComponent extends React.Component {
 
-    // --------------------------------------------------------------
-
     constructor(props){
         super(props);
         this.state = {
@@ -23,6 +21,7 @@ export default class PlayerComponent extends React.Component {
             Rebounds: new Animated.Value(0),
             Steals: new Animated.Value(0),
             Blocks: new Animated.Value(0),
+            Turnovers : new Animated.Value(0),
             Minutes: new Animated.Value(0)
         }
     }
@@ -30,47 +29,46 @@ export default class PlayerComponent extends React.Component {
     componentDidMount() {
 
         const stats = {
-            Points: (Number.parseInt(this.props.info.ppg)+1) * 8, 
-            Assists : (Number.parseInt(this.props.info.apg)+1) * 8, 
-            Rebounds: (Number.parseInt(this.props.info.rpg)+1) * 8, 
-            Steals : (Number.parseInt(this.props.info.spg)+1) * 8, 
-            Blocks : (Number.parseInt(this.props.info.bpg)+1) * 8,
-            //Turnovers : ((Number.parseInt(this.props.info.turnovers) / (Number.parseInt(this.props.info.gamesPlayed))) + 1) * 8,
-            Minutes : (Number.parseInt(this.props.info.mpg)+1) * 6
+            Points: Number.parseFloat(this.props.info.ppg) * 8.5, 
+            Assists : Number.parseFloat(this.props.info.apg) * 8.5, 
+            Rebounds: Number.parseFloat(this.props.info.rpg) * 8.5, 
+            Steals : Number.parseFloat(this.props.info.spg) * 8.5, 
+            Blocks : Number.parseFloat(this.props.info.bpg) * 8.5,
+            Turnovers : Number.parseFloat(this.props.info.turnovers/this.props.info.gamesPlayed) * 8.5,
+            Minutes : Number.parseFloat(this.props.info.mpg) * 6.5
         };
+        
         //Alert.alert(stats);
-        const indicators = ['Points', 'Assists', 'Rebounds', 'Steals', 'Blocks', 'Minutes']
+        const indicators = ['Points', 'Assists', 'Rebounds', 'Steals', 'Blocks', 'Turnovers', 'Minutes'];
+        
         Animated.parallel(indicators.map(item => {
             return Animated.timing(this.state[item], {
                                     toValue: stats[item],
-                                    duration: 2000,
+                                    duration: 3000,
                                 })
         })).start()
-
     }
-
-    // --------------------------------------------------------------
 
     render() {
         
-        const {Points, Assists, Rebounds, Steals, Blocks, Minutes} = this.state
+        const {Points, Assists, Rebounds, Steals, Blocks, Turnovers, Minutes} = this.state;
 
         return(
-            <View style = {{flexDirection: 'column', paddingTop: 65}}>
+            <View style = {styles.main}>
 
                 <View style = {styles.zone}>
                     <Image
-                        style={{width: 130, height: 130, alignSelf: 'center', borderRadius: 50, borderWidth: 1,
-                        borderColor: 'white', marginBottom: 5, marginTop: 20, backgroundColor : 'white'}}
+                        style={styles.photo}
                         source={{uri: this.props.image}}
                     />
-                    <Text style = {{alignSelf: 'center', fontSize : 20, fontStyle : 'italic', marginBottom: 10}}> {this.props.first} {this.props.last} </Text>
+                    <Text style = {styles.name}> {this.props.first} {this.props.last} </Text>
+                    <Text style = {styles.jersey}> {this.props.jersey} </Text>
                 </View>
 
                 <Text style = {styles.content}>
                     <Text style = {styles.label}> Points </Text>
                     <Text style = {styles.data}>
-                        {<Animated.View style={[styles.barStyles, styles.points, {width : Points}]} />} 
+                        <Animated.View style={[styles.barStyles, styles.points, {width : Points}]} /> 
                         <Text style = {styles.dataNum}> {this.props.info.ppg} </Text>
                     </Text>
                 </Text>
@@ -78,7 +76,7 @@ export default class PlayerComponent extends React.Component {
                 <Text style = {styles.content}>
                     <Text style = {styles.label}> Rebounds </Text>
                     <Text style = {styles.data}>
-                        {<Animated.View style={[styles.barStyles, styles.rebounds, {width : Rebounds}]} />} 
+                        <Animated.View style={[styles.barStyles, styles.rebounds, {width : Rebounds}]} /> 
                         <Text style = {styles.dataNum}> {this.props.info.rpg} </Text>
                     </Text>
                 </Text>
@@ -86,7 +84,7 @@ export default class PlayerComponent extends React.Component {
                 <Text style = {styles.content}>
                     <Text style = {styles.label}> Assists </Text>
                     <Text style = {styles.data}>
-                        {<Animated.View style={[styles.barStyles, styles.assists, {width : Assists}]} />} 
+                        <Animated.View style={[styles.barStyles, styles.assists, {width : Assists}]} /> 
                         <Text style = {styles.dataNum}> {this.props.info.apg} </Text>
                     </Text>
                 </Text>
@@ -94,7 +92,7 @@ export default class PlayerComponent extends React.Component {
                 <Text style = {styles.content}>
                     <Text style = {styles.label}> Steals </Text>
                     <Text style = {styles.data}>
-                        {<Animated.View style={[styles.barStyles, styles.steals, {width : Steals}]} />} 
+                        <Animated.View style={[styles.barStyles, styles.steals, {width : Steals}]} /> 
                         <Text style = {styles.dataNum}> {this.props.info.spg} </Text>
                     </Text>
                 </Text>
@@ -102,31 +100,80 @@ export default class PlayerComponent extends React.Component {
                 <Text style = {styles.content}>
                     <Text style = {styles.label}> Blocks </Text>
                     <Text style = {styles.data}>
-                        {<Animated.View style={[styles.barStyles, styles.blocks, {width : Blocks}]} />} 
+                        <Animated.View style={[styles.barStyles, styles.blocks, {width : Blocks}]} /> 
                         <Text style = {styles.dataNum}> {this.props.info.bpg} </Text>
+                    </Text>
+                </Text>
+
+                <Text style = {styles.content}>
+                    <Text style = {styles.label}> Turnovers </Text>
+                    <Text style = {styles.data}>
+                        <Animated.View style={[styles.barStyles, styles.turnovers, {width : Turnovers}]} /> 
+                        <Text style = {styles.dataNum}> {Number.parseFloat(this.props.info.turnovers/this.props.info.gamesPlayed).toFixed(1)} </Text>
                     </Text>
                 </Text>
 
                 <Text style = {styles.content}>
                     <Text style = {styles.label}> Minutes </Text>
                     <Text style = {styles.data}>
-                        {<Animated.View style={[styles.barStyles, styles.minutes, {width : Minutes}]} />} 
+                        <Animated.View style={[styles.barStyles, styles.minutes, {width : Minutes}]} /> 
                         <Text style = {styles.dataNum}> {this.props.info.mpg} </Text>
                     </Text>
                 </Text>
+
+                <View>
+                    <Image
+                        style={styles.team}
+                        source={{uri: this.props.team}}
+                    />
+                </View>
             
             </View>
         );
-
     }
-
   }
 
   const styles = StyleSheet.create({
     
+    main: {
+        flexDirection: 'column', 
+        paddingTop: 65
+    },
     zone: {
         backgroundColor : 'gold',
         marginBottom : 10
+    },
+    photo:{
+        width: 130, 
+        height: 130, 
+        alignSelf: 'center', 
+        borderRadius: 50, 
+        borderWidth: 1,
+        borderColor: 'white', 
+        marginTop: 20, 
+        marginBottom: 8, 
+        backgroundColor : 'white'
+    },
+    name: {
+        alignSelf: 'center', 
+        fontSize : 20, 
+        fontStyle : 'italic', 
+    },
+    jersey: {
+        alignSelf: 'center', 
+        fontSize : 17, 
+        fontStyle : 'italic', 
+        marginBottom: 5
+    },
+    team: {
+        width: 155, 
+        height: 155, 
+        alignSelf: 'center', 
+        borderRadius: 50, 
+        borderWidth: 1,
+        borderColor: 'white', 
+        marginTop: 20,  
+        backgroundColor : 'white'
     },
 
     data: {
